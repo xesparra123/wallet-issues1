@@ -11,6 +11,17 @@ const userByAccountId = async (accountId) => {
   return user;
 };
 
+const userById = async (id) => {
+  //Validations
+  if (!id) throw new Error('id is required');
+
+  //Execution
+  
+  let user = await knex.select('*').from('users')
+    .where('users.id', id);
+  return user;
+};
+
 const userRolesByUserId = async (userId) => {
   //Validations
   if (!userId) throw new Error('userId is required');
@@ -53,22 +64,51 @@ const getAccountByEmail = async (email) => {
   return accessCodes; 
 };
 
-const getEmployeesDuplicated = async () => {
+const getAccountById = async (id) => {
   //Execution
-  let accessCodes = await knex.select('employees.number', 'employees.employerId', knex.raw(
-    'COUNT(id) as total'
-  ))
+  let account = await knex.select('accounts.id', 'accounts.firstName', 'accounts.lastName', 'accessCodes.code','accounts.email','accessCodes.status')
+    .from('accounts')
+    .leftJoin('accessCodes', 'accessCodes.accountId', 'accounts.id')
+    .where('accounts.id', id); 
+  return account; 
+};
+
+const getEmployeesDuplicated = async (employerId) => {
+  if (!employerId) throw new Error('employerId is required');
+
+  //Execution
+  let employees = await knex.select(
+    'employees.*',
+    'users.firstName',
+    'users.middleName',
+    'users.lastName',
+    'users.email',
+    'users.accountId'
+  ) .from('employees') 
+    .join('user_roles', 'user_roles.userId', 'employees.userId')
+    .join('users', 'users.id', 'employees.userId')
+    .where({'user_roles.employerId': employerId }).limit(2); //quitar el limite
+
+  return employees; 
+};
+
+const getEmployees = async (data) => {
+  //Execution
+  let employees = await knex.select('*')
     .from('employees')
-    .groupBy('employees.number', 'employees.employerId')
-    .having('total','>','1'); 
-  return accessCodes; 
+    .where('employees.number',data.number )
+    .where('employees.employerId',data.employerId); 
+  return employees; 
 };
 
 module.exports = {
   userByAccountId,
+  userById,
   getAccessCodeRevoked,
   userRolesByUserId,
   getUserByParams,
   getAccountByEmail,
-  getEmployeesDuplicated
+  getEmployeesDuplicated,
+  getEmployees,
+  getAccountById
 };

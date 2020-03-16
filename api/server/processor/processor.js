@@ -67,6 +67,56 @@ const searchMatchUsers = async (user) => {
   }
 };
 
+const searchEmployeesDuplicates = async (path) => {
+  try {
+    let fileStream = await fs.readFileSync(path, 'utf8');
+    let dataToSearch = JSON.parse(fileStream);
+    for (let data of dataToSearch){
+      await employeesToSearch(data);
+    }
+  } catch (error) {
+    console.log('error on searchEmployeesDuplicates', error);
+  }
+};
+
+const employeesToSearch = async (data) => {
+  try {
+    let employees = await userRepository.getEmployees(data);
+    for (let employee of employees) {
+      await searchUserByEmployee(employee);
+    }
+  } catch (error) {
+    console.log('error on employeesToSearch', error);
+  }
+};
+
+const searchUserByEmployee = async (employee) => {
+  try {
+    if(!employee.userId) {
+      console.log('employee not have userId associate',employee);
+    }else {
+      employee.users = await userRepository.userById(employee.userId);
+    }
+
+    if (employee.users && employee.users.length && employee.users.length > 1 ){
+      //remove employees duplicate y dejar solo el que tenga userId o el que coincida con la data del user 
+      console.log('many users',employee.users);
+    }
+    else {
+      //validate employee on HR (number, employerId, firstName, LastName)
+      console.log('one user',employee.users);
+    }
+    //remove the user roles and add new user roles del employer
+    for (const user of employee.users) {
+      let userWithRoles =  await addUserRolesToUser(user);
+      console.log(userWithRoles);
+    }
+  } catch (error) {
+    console.log('error on searchUserByEmployee', error);
+  }
+};
+
 module.exports = {
-  createItemsToValidateOnWallet
+  createItemsToValidateOnWallet,
+  searchEmployeesDuplicates
 };
