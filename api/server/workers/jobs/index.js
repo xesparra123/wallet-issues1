@@ -1,8 +1,12 @@
+const accessCodes = require('./accessCodes');
+const validateAccount = require('./validateAccount');
+
+
 module.exports = {
-  calculateStatus: require('./calculateStatus'),
-  startUploadProcess: require('./startUploadProcess'),
+  accessCodes,
+  validateAccount,
   processAll: function() {
-    this.calculateStatus.processJob();
-    this.startUploadProcess.processJob();
+    this.accessCodes.processJob();
+    this.validateAccount.processJob();
   }
 };

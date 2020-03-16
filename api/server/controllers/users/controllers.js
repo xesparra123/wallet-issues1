@@ -1,5 +1,5 @@
 const userRepository = require('../../repositories/users');
-const workers = require('../../processor/processor');
+const workers = require('../../workers/jobs');
 let fs = require('fs');
 let path = require('path');
 let route = path.join(__dirname, 'Files/accessCodeRevoked.json');
@@ -17,8 +17,9 @@ const getAccessCodeRevoked = async (req, res, next) => {
     await fs.writeFileSync(route, json, 'utf8');
 
     //send to worker to valida on wallet data
-    await workers.createItemsToValidateOnWallet(route);
-    res.status(200).json({msg:'Archivo encolado para procesar', route});
+    await workers.accessCodes.addToQueue(route);
+    
+    res.status(200).json({ msg: 'Archivo encolado para procesar', route });
   } catch (error) {
     next(error);
   }
