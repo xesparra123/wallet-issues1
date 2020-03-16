@@ -1,0 +1,21 @@
+{
+    "arrowParens": "avoid",
+    "bracketSpacing": true,
+    "disableLanguages": ["vue"],
+    "endOfLine": "auto",
+    "eslintIntegration": true,
+    "ignorePath": ".prettierrc.json",
+    "jsxBracketSameLine": false,
+    "jsxSingleQuote": false,
+    "parser": "babylon",
+    "printWidth": 80,
+    "proseWrap": "preserve",
+    "requireConfig": false,
+    "semi": true,
+    "singleQuote": true,
+    "stylelintIntegration": false,
+    "tabWidth": 2,
+    "trailingComma": "none",
+    "tslintIntegration": false,
+    "useTabs": false
+  }
