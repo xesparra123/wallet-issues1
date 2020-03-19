@@ -1,6 +1,7 @@
 let fs = require('fs');
 const userRepository = require('../repositories/users');
 const validateAccount = require('../workers/jobs/validateAccount');
+let path = require('path');
 
 const createItemsToValidateOnWallet = async path => {
   //try {
@@ -128,8 +129,62 @@ const searchUserByEmployee = async (employee) => {
   }
 };
 
+const createOrUpdateReportFile = async (type, data) => {
+  try {
+    let dataToAppend = '';
+    switch (type) {
+    case 'employeesDuplicateOnWalletAndHR':{
+      for (const user of data.users) {
+        dataToAppend += `${user.firstName},`;
+        dataToAppend += `${user.lastName},`;
+        dataToAppend += `${user.email},`;
+        dataToAppend += `${user.accountId},`;
+      
+        let employersAffected = '';
+        let typeOfAccounts = '';
+        let employeesNumbers = '';
+        for (const userRole of user.user_roles) {
+          if(!employersAffected.includes(userRole.employerId)){
+            employersAffected = `${userRole.employerId}-`;
+          }
+          if(!typeOfAccounts.includes(userRole.cd_entity)){
+            typeOfAccounts = `${userRole.cd_entity}-`;
+          }
+          //buscar el Id de wallet del employee y el number 
+          for (const employee of userRole.employees) {
+            if(employeesNumbers && !employeesNumbers.includes(employee.number)){
+              employeesNumbers = `${employee.number}-`;
+            }
+          }
+        }
+        dataToAppend += `${employersAffected},`;
+        dataToAppend += `${typeOfAccounts},`;
+        dataToAppend += `${employeesNumbers} \n`;
+      }
+      await buildFile(type,dataToAppend);
+    }
+      break;
+    
+    default:
+      break;
+    }
+    console.log(dataToAppend); 
+  } catch (error) {
+    console.log('error on createOrUpdateReportFile', error);
+  }
+};
+
+const buildFile = async (type, data) => {
+  let route = path.join(__dirname, `Files/${type}.csv`);
+  //validate if the file exist, I replace the file always
+  let fileExits = await fs.existsSync(route);
+  if (fileExits) await fs.appendFileSync(route, data, 'utf8'); 
+  else await fs.writeFileSync(route, data, 'utf8'); 
+};
+
 module.exports = {
   createItemsToValidateOnWallet,
   accountToValidateOnWallet,
-  searchEmployeesDuplicates
+  searchEmployeesDuplicates,
+  createOrUpdateReportFile
 };

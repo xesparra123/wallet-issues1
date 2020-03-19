@@ -32,7 +32,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.22.2",
     "mysql": "^2.15.0",
-    "oracledb": "^4.0.1",
+    "oracledb": "^4.2.0",
     "passport": "^0.4.0",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",

@@ -6,6 +6,7 @@ const usersRouter = express.Router();
 
 usersRouter.get('/get-access-codes-revoked', controller.getAccessCodeRevoked);
 usersRouter.get('/:employerId/get-employees-duplicated', controller.getEmployeesDuplicated);
+usersRouter.get('/testCreateFile', controller.testGenerateFile);
 
 router.use('/users', usersRouter);
 module.exports = router; 
