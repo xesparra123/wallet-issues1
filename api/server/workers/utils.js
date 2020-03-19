@@ -49,8 +49,11 @@ const createProducer = (
 };
 
 const queueNames = {
-  calculateStatus: 'ACCESS_CODES',
-  validateAccount: 'VALIDATE_ACCOUNT'
+  accessCodes: 'ACCESS_CODES',
+  validateAccount: 'VALIDATE_ACCOUNT',
+  searchEmployees: 'SEARCH_EMPLOYEES',
+  searchUsers: 'SEARCH_USERS',
+  searchUserRoles: 'SEARCH_USER_ROLES'
 };
 
 // const updateFlagInRedis = async ({ fileId, rowId }) => {
@@ -80,7 +83,13 @@ const queueNames = {
 //   return completed.length + failed;
 // };
 
-const queuesProcesses = ['ACCESS_CODES', 'VALIDATE_ACCOUNT'];
+const queuesProcesses = [
+  'ACCESS_CODES',
+  'VALIDATE_ACCOUNT',
+  'SEARCH_EMPLOYEES',
+  'SEARCH_USERS',
+  'SEARCH_USER_ROLES'
+];
 
 module.exports = {
   createProducer,

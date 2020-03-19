@@ -2,7 +2,7 @@ const workers = require('../../processor/processor');
 
 const { createProducer, getQueue } = require('../utils');
 
-const queueName = 'ACCESS_CODES';
+const queueName = 'SEARCH_EMPLOYEES';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
@@ -14,9 +14,10 @@ const addToQueue = set => {
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
+
       const { set: route } = job.data;
-      
-      await workers.createItemsToValidateOnWallet(route);
+      //TODO: SEARCH EMPLOYEE
+      await workers.searchEmployeesDuplicates(route);
 
       job.progress(100);
       done(null, job.data);
