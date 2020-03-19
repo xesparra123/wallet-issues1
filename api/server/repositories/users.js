@@ -1,5 +1,4 @@
 const knex = require('../db');
-const _ = require('lodash');
 
 const userByAccountId = async accountId => {
   //Validations
@@ -138,8 +137,8 @@ const getUsers = () => {
       //'user_roles.*'
     )
     .from('users AS user')
-    //.where({ 'user.id': 790678 }) //TODO: ELIMINAR ESTO
-    .limit(10); //quitar el limite
+    .where({ 'user.id': 790678 }); //TODO: ELIMINAR ESTO
+  //.limit(10); //quitar el limite
 
   // for (let i = 0; i < users.length; i++) {
   //   let roles = await userRolesByUserIdAndEmployerId(users[i].id, employerId);
@@ -169,5 +168,6 @@ module.exports = {
   getAccountByEmail,
   getUsers,
   getEmployees,
-  getAccountById
+  getAccountById,
+  userRolesByUserIdAndEmployerId
 };

@@ -53,7 +53,9 @@ const queueNames = {
   validateAccount: 'VALIDATE_ACCOUNT',
   searchEmployees: 'SEARCH_EMPLOYEES',
   searchUsers: 'SEARCH_USERS',
-  searchUserRoles: 'SEARCH_USER_ROLES'
+  searchUserRoles: 'SEARCH_USER_ROLES',
+  searchEmployeeEntity: 'SEARCH_EMPLOYEE_ENTITY',
+  searchEmployeeHr: 'SEARCH_EMPLOYEE_HR'
 };
 
 // const updateFlagInRedis = async ({ fileId, rowId }) => {
@@ -88,7 +90,9 @@ const queuesProcesses = [
   'VALIDATE_ACCOUNT',
   'SEARCH_EMPLOYEES',
   'SEARCH_USERS',
-  'SEARCH_USER_ROLES'
+  'SEARCH_USER_ROLES',
+  'SEARCH_EMPLOYEE_ENTITY',
+  'SEARCH_EMPLOYEE_HR'
 ];
 
 module.exports = {

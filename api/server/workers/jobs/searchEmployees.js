@@ -1,11 +1,12 @@
-const userRepository = require('../../repositories/users');
+const employeeRepository = require('../../repositories/employees');
 const { createProducer, getQueue } = require('../utils');
 
-const queueName = 'SEARCH_USER_ROLES';
+const queueName = 'SEARCH_EMPLOYEE_ENTITY';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
-const searchEmployeeEntityWorker = require('./searchEmployees');
+
+const searchEmployeeHrWorker = require('./searchEmployeeHR');
 
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
@@ -15,27 +16,26 @@ const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
       const { set } = job.data;
-      const { users, employerId } = set;
+      const { users } = set;
 
       for (let i = 0; i < users.length; i++) {
-        let roles = await userRepository.userRolesByUserIdAndEmployerId(
-          users[i].id,
-          employerId
-        );
+        for (let k = 0; k < users[i].user_roles.length; k++) {
+          let employees = await employeeRepository.getEmployeeByEntityId(
+            users[i].user_roles[k].id_entity
+          );
 
-        users[i].user_roles = [];
+          users[i].user_roles[k].employees = [];
 
-        if (roles.length) users[i].user_roles = roles;
-
+          if (employees) {
+            users[i].user_roles[k].employees = employees;
+          }
+        }
         job.progress(Math.round((i / users.length) * 100));
       }
 
       job.progress(100);
-
-      searchEmployeeEntityWorker.addToQueue({
-        users
-      });
-      
+      searchEmployeeHrWorker.addToQueue({ users });
+      // console.log('finalizando users roles');
       done(null, { date: new Date(), users });
       //done(null, job.data);
     } catch (error) {
