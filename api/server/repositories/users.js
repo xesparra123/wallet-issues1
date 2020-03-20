@@ -133,8 +133,7 @@ const getUsers = () => {
         'user.accountId'
         //'user_roles.*'
       )
-      .from('users AS user')//TODO: ELIMINAR ESTO
-      //.limit(1000)
+      .from('users AS user')
   );
 };
 

@@ -38,7 +38,7 @@ workers.processAll();
 
 const arenaConfig = Arena({ queues }, { basePath: '/', disableListen: true });
 
-app.use('/', arenaConfig);
+app.use('/ui', arenaConfig);
 
 app.listen(port, () => {
   console.log(`Bull Arena Running on port ${port}`);

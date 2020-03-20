@@ -1,3 +1,6 @@
+let fs = require('fs');
+let path = require('path');
+
 const employeeRepository = require('../../repositories/employees');
 const { createProducer, getQueue } = require('../utils');
 
@@ -12,11 +15,27 @@ const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
 };
 
+const writeFile = async users => {
+  let route = path.join(__dirname, 'Files/usersRolesWallet.json');
+
+  let json = JSON.stringify(users);
+
+  let fileExits = await fs.existsSync(route);
+  if (fileExits) await fs.unlinkSync(route);
+
+  await fs.writeFileSync(route, json, 'utf8');
+};
+
+const readFile = async () => {
+  const route = path.join(__dirname, 'Files/usersRoles.json');
+  const rawdata = fs.readFileSync(route);
+  return JSON.parse(rawdata);
+};
+
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
-      const { set } = job.data;
-      const { users } = set;
+      let users = await readFile();
 
       for (let i = 0; i < users.length; i++) {
         for (let k = 0; k < users[i].user_roles.length; k++) {
@@ -39,7 +58,8 @@ const processJob = async () => {
       }
 
       job.progress(100);
-      searchEmployeeHrWorker.addToQueue({ users });
+      await writeFile(users);
+      searchEmployeeHrWorker.addToQueue();
       // console.log('finalizando users roles');
       done(null, { date: new Date() });
       //done(null, job.data);

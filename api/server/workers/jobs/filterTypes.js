@@ -14,6 +14,12 @@ const {
   oneRoleButEmployeesFilter
 } = require('./../../processor/processor');
 
+const readFile = async () => {
+  const route = path.join(__dirname, 'Files/usersRolesWalletHR.json');
+  const rawdata = fs.readFileSync(route);
+  return JSON.parse(rawdata);
+};
+
 const writeResultFile = async filters => {
   let route = path.join(__dirname, 'Files/result.json');
 
@@ -23,8 +29,8 @@ const writeResultFile = async filters => {
   if (fileExits) await fs.unlinkSync(route);
   await fs.writeFileSync(route, json, 'utf8');
 
-  let output = '';
   for (let i = 0; i < filters.length; i++) {
+    let output = '';
     for (let j = 0; j < filters[i].data.length; j++) {
       output += `${filters[i].data[j].id}, `;
       output += `${filters[i].data[j].firstName}, `;
@@ -55,7 +61,6 @@ const writeResultFile = async filters => {
           l < filters[i].data[j].user_roles[k].employees.length;
           l++
         ) {
-
           if (l > 0) {
             output += `${filters[i].data[j].user_roles[k].id}, `;
             output += `${filters[i].data[j].user_roles[k].cd_entity}, `;
@@ -99,8 +104,13 @@ const writeResultFile = async filters => {
     }
 
     console.log(`Files/${filters[i].type}.csv`);
-    let route = path.join(__dirname, `Files/${filters[i].type}.csv`);
-    await fs.writeFileSync(route, output, 'utf8');
+    let fileRoute = path.join(__dirname, `Files/${filters[i].type}.csv`);
+    let fileExits = await fs.existsSync(fileRoute);
+    if (fileExits) await fs.unlinkSync(fileRoute);
+    console.log(`Writing ${filters[i].type}.csv ...`);
+    await fs.writeFileSync(fileRoute, output, 'utf8');
+
+    console.log(`Done ${filters[i].type}.csv ...`);
   }
 };
 const addToQueue = set => {
@@ -110,8 +120,7 @@ const addToQueue = set => {
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
-      const { set } = job.data;
-      const { users } = set;
+      let users = await readFile();
 
       const userWithoutRoles = users.filter(
         user => user.user_roles.length === 0
@@ -202,7 +211,7 @@ const processJob = async () => {
       console.log('Filtering cases.. 100%');
       job.progress(100);
       // console.log('finalizando users roles');
-      done(null, { date: new Date(), result });
+      done(null, { date: new Date() });
       //done(null, job.data);
     } catch (error) {
       done(error.response ? error.response.data : error);

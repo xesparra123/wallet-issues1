@@ -1,3 +1,6 @@
+let fs = require('fs');
+let path = require('path');
+
 const userRepository = require('../../repositories/users');
 const { createProducer, getQueue } = require('../utils');
 
@@ -12,10 +15,20 @@ const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
 };
 
+const writeFile = async users => {
+  let route = path.join(__dirname, 'Files/users.json');
+
+  let json = JSON.stringify(users);
+
+  let fileExits = await fs.existsSync(route);
+  if (fileExits) await fs.unlinkSync(route);
+
+  await fs.writeFileSync(route, json, 'utf8');
+};
+
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
-
       let users = [];
       const stream = await userRepository.getUsers().stream();
 
@@ -33,11 +46,10 @@ const processJob = async () => {
             done(error);
           }
         })
-        .on('end', () => {
+        .on('end', async () => {
           job.progress(100);
-          searchUserRolesWorker.addToQueue({
-            users
-          });
+          await writeFile(users);
+          searchUserRolesWorker.addToQueue();
           done(null, { date: new Date(), count: users.length });
         })
         .on('error', done);
