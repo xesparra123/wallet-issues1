@@ -30,13 +30,18 @@ const processJob = async () => {
             users[i].user_roles[k].employees = employees;
           }
         }
+        console.log(
+          `Searching employees wallet.. i:${i} - total: ${
+            users.length
+          } -  ${Math.round(((i + 1) / users.length) * 100)}%`
+        );
         job.progress(Math.round((i / users.length) * 100));
       }
 
       job.progress(100);
       searchEmployeeHrWorker.addToQueue({ users });
       // console.log('finalizando users roles');
-      done(null, { date: new Date(), users });
+      done(null, { date: new Date() });
       //done(null, job.data);
     } catch (error) {
       done(error.response ? error.response.data : error);

@@ -15,17 +15,20 @@ const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
       const { set } = job.data;
-      const { users, employerId } = set;
+      const { users } = set;
 
       for (let i = 0; i < users.length; i++) {
-        let roles = await userRepository.userRolesByUserIdAndEmployerId(
-          users[i].id,
-          employerId
-        );
+        let roles = await userRepository.userRolesEmployeeByUserId(users[i].id);
 
         users[i].user_roles = [];
 
         if (roles.length) users[i].user_roles = roles;
+
+        console.log(
+          `Searching roles.. i:${i} - total: ${users.length} - ${Math.round(
+            ((i + 1) / users.length) * 100
+          )}%`
+        );
 
         job.progress(Math.round((i / users.length) * 100));
       }
@@ -35,8 +38,8 @@ const processJob = async () => {
       searchEmployeeEntityWorker.addToQueue({
         users
       });
-      
-      done(null, { date: new Date(), users });
+
+      done(null, { date: new Date() });
       //done(null, job.data);
     } catch (error) {
       done(error.response ? error.response.data : error);

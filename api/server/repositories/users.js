@@ -40,18 +40,14 @@ const userRolesByUserId = async userId => {
   return userRoles;
 };
 
-const userRolesByUserIdAndEmployerId = async (userId, employerId) => {
+const userRolesEmployeeByUserId = async userId => {
   //Validations
   if (!userId) throw new Error('userId is required');
-
-  if (!employerId) throw new Error('employerId is required');
-  //Execution
 
   let userRoles = await knex
     .select('*')
     .from('user_roles')
     .where('user_roles.userId', userId)
-    .andWhere({ 'user_roles.employerId': employerId })
     .andWhere({ cd_entity: 'employee' });
 
   return userRoles;
@@ -126,27 +122,20 @@ const getUsers = () => {
   //if (!employerId) throw new Error('employerId is required');
 
   //Execution
-  return knex
-    .select(
-      'user.id',
-      'user.firstName',
-      'user.middleName',
-      'user.lastName',
-      'user.email',
-      'user.accountId'
-      //'user_roles.*'
-    )
-    .from('users AS user')
-    .where({ 'user.id': 790678 }); //TODO: ELIMINAR ESTO
-  //.limit(10); //quitar el limite
-
-  // for (let i = 0; i < users.length; i++) {
-  //   let roles = await userRolesByUserIdAndEmployerId(users[i].id, employerId);
-
-  //   users[i].user_roles = [];
-
-  //   if (roles.length) users[i].user_roles = roles;
-  // }
+  return (
+    knex
+      .select(
+        'user.id',
+        'user.firstName',
+        'user.middleName',
+        'user.lastName',
+        'user.email',
+        'user.accountId'
+        //'user_roles.*'
+      )
+      .from('users AS user')//TODO: ELIMINAR ESTO
+      //.limit(1000)
+  );
 };
 
 const getEmployees = async data => {
@@ -169,5 +158,5 @@ module.exports = {
   getUsers,
   getEmployees,
   getAccountById,
-  userRolesByUserIdAndEmployerId
+  userRolesEmployeeByUserId
 };

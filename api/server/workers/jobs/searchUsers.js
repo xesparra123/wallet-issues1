@@ -15,13 +15,9 @@ const addToQueue = set => {
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
-      //console.log('data2', job.data);
-      const { set: employerId } = job.data;
 
       let users = [];
-      const stream = await userRepository.getUsers(employerId).stream();
-
-      let count = 0;
+      const stream = await userRepository.getUsers().stream();
 
       stream
         .on('readable', async () => {
@@ -29,8 +25,6 @@ const processJob = async () => {
             let user = await stream.read();
 
             while (user) {
-              count++;
-              // console.log('user', user);
               users.push(user);
 
               user = await stream.read();
@@ -41,16 +35,10 @@ const processJob = async () => {
         })
         .on('end', () => {
           job.progress(100);
-          console.log('termine users', {
-            searchUserRolesWorker,
-            users,
-            employerId
-          });
           searchUserRolesWorker.addToQueue({
-            users,
-            employerId: parseInt(employerId)
+            users
           });
-          done(null, { date: new Date(), count, users });
+          done(null, { date: new Date(), count: users.length });
         })
         .on('error', done);
       //job.progress(100);
