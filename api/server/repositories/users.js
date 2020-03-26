@@ -47,8 +47,7 @@ const userRolesEmployeeByUserId = async userId => {
   let userRoles = await knex
     .select('*')
     .from('user_roles')
-    .where('user_roles.userId', userId)
-    .andWhere({ cd_entity: 'employee' });
+    .where('user_roles.userId', userId);
 
   return userRoles;
 };
