@@ -1,20 +1,19 @@
-require('newrelic');
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config({ path: '.env' });
 
-let requiredEnv = ['UPLOAD_SERVER_PORT', 'FIND_OR_CREATE_SQS_URL'];
+let requiredEnv = ['ACCESS_CODE_QUEUE_PORT'];
 
 for (let envVar of requiredEnv) {
   if (!process.env[envVar])
     throw new Error(`${envVar} env varible must be declared in .env file`);
 }
 
-const UPLOAD_SERVER_PORT = +process.env.UPLOAD_SERVER_PORT;
+const ACCESS_CODE_QUEUE_PORT = +process.env.ACCESS_CODE_QUEUE_PORT;
 
 //init the server
 const server = require('./server');
 
-server.listen(UPLOAD_SERVER_PORT, () => {
-  console.log(`Uploads queue listening on port: ${UPLOAD_SERVER_PORT}`);
+server.listen(ACCESS_CODE_QUEUE_PORT, () => {
+  console.log(`Uploads queue listening on port: ${ACCESS_CODE_QUEUE_PORT}`);
 });
 
 process.on('SIGINT', () => {

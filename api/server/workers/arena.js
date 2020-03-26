@@ -6,6 +6,8 @@ const port = process.env.ARENA_APP_PORT;
 const app = express();
 const { queuesProcesses } = require('./utils');
 
+const workers = require('./jobs');
+
 const requiredEnv = [
   'REDIS_PORT',
   'REDIS_HOST',
@@ -22,7 +24,7 @@ let queues = [];
 for (const queueName of queuesProcesses) {
   queues.push({
     name: queueName,
-    hostId: 'posthire',
+    hostId: 'wallet',
     redis: {
       port: process.env['REDIS_PORT'],
       host: process.env['REDIS_HOST'],
@@ -32,9 +34,11 @@ for (const queueName of queuesProcesses) {
   });
 }
 
+workers.processAll();
+
 const arenaConfig = Arena({ queues }, { basePath: '/', disableListen: true });
 
-app.use('/', arenaConfig);
+app.use('/ui', arenaConfig);
 
 app.listen(port, () => {
   console.log(`Bull Arena Running on port ${port}`);
