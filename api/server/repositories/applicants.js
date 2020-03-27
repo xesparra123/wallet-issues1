@@ -1,4 +1,6 @@
 const knex = require('../db');
+const prehire = require('../db/prehire');
+const TABLES = require('../db/prehire/tables');
 
 const getApplicantbyEntityId = async entityId => {
   //Validations
@@ -23,4 +25,21 @@ const getApplicantsByUserId = async userId => {
     .where('applicants.userId', userId);
 };
 
-module.exports = { getApplicantbyEntityId, getApplicantsByUserId };
+const getApplicantPrehire = async ({ employerId, candidateId }) => {
+  if (!employerId) throw new Error('employerId is required');
+
+  if (!candidateId) throw new Error('candidateId is required');
+
+  return prehire.raw(`
+      select *
+      from ${TABLES.applicants}
+      where employerId = ${employerId}
+      and taleoApplicantId = "${candidateId}"
+    `);
+};
+
+module.exports = {
+  getApplicantbyEntityId,
+  getApplicantsByUserId,
+  getApplicantPrehire
+};
