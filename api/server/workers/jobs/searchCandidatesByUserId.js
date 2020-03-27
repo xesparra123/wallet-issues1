@@ -38,14 +38,14 @@ const processJob = async () => {
       let users = await readFile();
 
       for (let i = 0; i < users.length; i++) {
-        let applicants = await applicantRepository.getApplicantsByUserId(
+        let candidates = await applicantRepository.getApplicantsByUserId(
           users[i].id
         );
 
-        users[i].applicants = [];
+        users[i].candidates = [];
 
-        if (applicants.length > 0) {
-          users[i].applicants = applicants;
+        if (candidates.length > 0) {
+          users[i].candidates = candidates;
         }
 
         console.log(

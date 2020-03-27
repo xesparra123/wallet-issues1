@@ -25,17 +25,22 @@ const getApplicantsByUserId = async userId => {
     .where('applicants.userId', userId);
 };
 
-const getApplicantPrehire = async ({ employerId, candidateId }) => {
-  if (!employerId) throw new Error('employerId is required');
+const getApplicantPrehire = async ({ prehireApplicantId }) => {
+  if (!prehireApplicantId) throw new Error('prehireApplicantId is required');
 
-  if (!candidateId) throw new Error('candidateId is required');
-
-  return prehire.raw(`
-      select *
+  const result = await prehire.raw(`
+      select 
+      firstName,
+      middleName,
+      lastName,
+      status,
+      employerId,
+      taleoApplicantId
       from ${TABLES.applicants}
-      where employerId = ${employerId}
-      and taleoApplicantId = "${candidateId}"
+      where id = ${prehireApplicantId}
     `);
+  
+  return result[0];
 };
 
 module.exports = {

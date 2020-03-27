@@ -42,7 +42,7 @@ const createProducer = (
   let jobOptions = {
     attempts,
     backoff: { type: 'fixed', delay: delayToRestart },
-    removeOnComplete: true
+    removeOnComplete: false
   };
 
   return queue.add(queueName, jobData, jobOptions);

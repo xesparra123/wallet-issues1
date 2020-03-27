@@ -39,13 +39,13 @@ const processJob = async () => {
       let users = await readFile();
 
       for (let i = 0; i < users.length; i++) {
-        for (let j = 0; j < users[i].user_roles.length; j++) {
+        for (let j = 0; j < users[i].employees.length; j++) {
           let number = users[i].employees[j].number;
           let employerId = users[i].employees[j].employerId;
 
           let raw = await evercheckRepository.getEmployeeHr(number, employerId);
 
-          users[i].employeeHr = [];
+          users[i].employees[j].employeeHr = [];
 
           if (raw.length) {
             let employeeHr = helper.mapToEmployee(raw);

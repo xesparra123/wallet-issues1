@@ -4,8 +4,6 @@ const workers = require('../../workers/jobs');
 let fs = require('fs');
 let path = require('path');
 
-const helper = require('./helper');
-
 const getAccessCodeRevoked = async (req, res, next) => {
   try {
     let route = path.join(__dirname, 'Files/accessCodeRevoked.json');
@@ -28,8 +26,7 @@ const getAccessCodeRevoked = async (req, res, next) => {
 
 const getEmployeesDuplicated = async (req, res, next) => {
   try {
-    const { employerId } = req.params;
-    await workers.searchUsers.addToQueue(employerId);
+    await workers.searchUsers.addToQueue();
 
     // const userWithRoles = await userRepository.getUsers(employerId);
 
