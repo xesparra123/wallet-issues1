@@ -8,7 +8,7 @@ const queueName = 'SEARCH_USER_ROLES';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
-const searchEmployeeEntityWorker = require('./searchEmployees');
+const searchEmployeeEntityWorker = require('./searchEntityByUserRole');
 
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
@@ -24,7 +24,6 @@ const writeFile = async users => {
 
   await fs.writeFileSync(route, json, 'utf8');
 };
-
 
 const readFile = async () => {
   const route = path.join(__dirname, 'Files/users.json');
@@ -54,7 +53,6 @@ const processJob = async () => {
       }
 
       job.progress(100);
-
 
       await writeFile(users);
       searchEmployeeEntityWorker.addToQueue();

@@ -4,12 +4,12 @@ let path = require('path');
 const employeeRepository = require('../../repositories/employees');
 const { createProducer, getQueue } = require('../utils');
 
-const queueName = 'SEARCH_EMPLOYEE_ENTITY';
+const queueName = 'SEARCH_EMPLOYEE_ENTITY_BY_USERID';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
 
-const searchEmployeeHrWorker = require('./searchEmployeeHR');
+const searchCandidatesWorker = require('./searchCandidatesByUserId');
 
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
@@ -38,17 +38,16 @@ const processJob = async () => {
       let users = await readFile();
 
       for (let i = 0; i < users.length; i++) {
-        for (let k = 0; k < users[i].user_roles.length; k++) {
-          let employees = await employeeRepository.getEmployeeByEntityId(
-            users[i].user_roles[k].id_entity
-          );
+        let employees = await employeeRepository.getEmployeesByUserId(
+          users[i].id
+        );
 
-          users[i].user_roles[k].employees = [];
+        users[i].employees = [];
 
-          if (employees) {
-            users[i].user_roles[k].employees = employees;
-          }
+        if (employees.length > 0) {
+          users[i].employees = employees;
         }
+
         console.log(
           `Searching employees wallet.. i:${i} - total: ${
             users.length
@@ -59,7 +58,7 @@ const processJob = async () => {
 
       job.progress(100);
       await writeFile(users);
-      searchEmployeeHrWorker.addToQueue();
+      searchCandidatesWorker.addToQueue();
       // console.log('finalizando users roles');
       done(null, { date: new Date() });
       //done(null, job.data);
