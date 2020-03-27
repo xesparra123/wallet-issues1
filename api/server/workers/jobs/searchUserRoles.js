@@ -37,11 +37,39 @@ const processJob = async () => {
       let users = await readFile();
 
       for (let i = 0; i < users.length; i++) {
-        let roles = await userRepository.userRolesEmployeeByUserId(users[i].id);
+        let roles = await userRepository.userRolesByUserId(users[i].id);
 
         users[i].user_roles = [];
+        users[i].orphanRoles = [];
 
-        if (roles.length) users[i].user_roles = roles;
+        if (roles.length) {
+          users[i].userRoles = roles;
+          for (let j = 0; j < roles.length; j++) {
+            if (roles[j].cd_entity === 'employee') {
+              const index = users[i].employees.findIndex(
+                employee => employee.id === roles[j].id_entity
+              );
+
+              if (index > -1) {
+                users[i].employees[index].user_role = roles[j];
+              } else {
+                users[i].orphanRoles.push(roles[j]);
+              }
+            } else if (roles[j].cd_entity === 'applicant') {
+              const index = users[i].candidates.findIndex(
+                candidate => candidate.id === roles[j].id_entity
+              );
+
+              if (index > -1) {
+                users[i].candidates[index].user_role = roles[j];
+              } else {
+                users[i].orphanRoles.push(roles[j]);
+              }
+            } else if (roles[j].cd_entity === 'wanderer') {
+              users[i].wandererRole = roles[j];
+            }
+          }
+        }
 
         console.log(
           `Searching roles.. i:${i} - total: ${users.length} - ${Math.round(

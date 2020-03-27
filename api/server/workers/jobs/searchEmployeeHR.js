@@ -10,7 +10,7 @@ const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
 
-const searchEmployeesByUserIdWorker = require('./searchEmployeesByUserId');
+const searchCandidatesByUserIdWorker = require('./searchCandidatesByUserId');
 
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
@@ -40,22 +40,17 @@ const processJob = async () => {
 
       for (let i = 0; i < users.length; i++) {
         for (let j = 0; j < users[i].user_roles.length; j++) {
-          for (let k = 0; k < users[i].user_roles[j].employees.length; k++) {
-            let number = users[i].user_roles[j].employees[k].number;
-            let employerId = users[i].user_roles[j].employees[k].employerId;
+          let number = users[i].employees[j].number;
+          let employerId = users[i].employees[j].employerId;
 
-            let raw = await evercheckRepository.getEmployeeHr(
-              number,
-              employerId
-            );
+          let raw = await evercheckRepository.getEmployeeHr(number, employerId);
 
-            users[i].user_roles[j].employeeHr = [];
+          users[i].employeeHr = [];
 
-            if (raw.length) {
-              let employeeHr = helper.mapToEmployee(raw);
+          if (raw.length) {
+            let employeeHr = helper.mapToEmployee(raw);
 
-              users[i].user_roles[j].employeeHr = employeeHr;
-            }
+            users[i].employees[j].employeeHr = employeeHr;
           }
         }
         console.log(
@@ -68,7 +63,7 @@ const processJob = async () => {
 
       job.progress(100);
       await writeFile(users);
-      searchEmployeesByUserIdWorker.addToQueue();
+      searchCandidatesByUserIdWorker.addToQueue();
       // console.log('finalizando users roles');
       done(null, { date: new Date() });
       //done(null, job.data);

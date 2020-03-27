@@ -121,19 +121,17 @@ const getUsers = () => {
   //if (!employerId) throw new Error('employerId is required');
 
   //Execution
-  return (
-    knex
-      .select(
-        'user.id',
-        'user.firstName',
-        'user.middleName',
-        'user.lastName',
-        'user.email',
-        'user.accountId'
-        //'user_roles.*'
-      )
-      .from('users AS user')
-  );
+  return knex
+    .select(
+      'user.id',
+      'user.firstName',
+      'user.middleName',
+      'user.lastName',
+      'user.email',
+      'user.accountId'
+      //'user_roles.*'
+    )
+    .from('users AS user');
 };
 
 const getEmployees = async data => {

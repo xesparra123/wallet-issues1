@@ -9,7 +9,7 @@ const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
 
-const searchCandidatesWorker = require('./searchCandidatesByUserId');
+const searchEmployeeHRWorker = require('./searchEmployeeHR');
 
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
@@ -58,7 +58,7 @@ const processJob = async () => {
 
       job.progress(100);
       await writeFile(users);
-      searchCandidatesWorker.addToQueue();
+      searchEmployeeHRWorker.addToQueue();
       // console.log('finalizando users roles');
       done(null, { date: new Date() });
       //done(null, job.data);
