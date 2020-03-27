@@ -4,7 +4,7 @@ let path = require('path');
 const employeeRepository = require('../../repositories/employees');
 const { createProducer, getQueue } = require('../utils');
 
-const queueName = 'SEARCH_EMPLOYEE_ENTITY_BY_USERID';
+const queueName = 'SEARCH_EMPLOYEE_ENTITY';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
@@ -16,7 +16,7 @@ const addToQueue = set => {
 };
 
 const writeFile = async users => {
-  let route = path.join(__dirname, 'Files/usersRolesWallet.json');
+  let route = path.join(__dirname, 'Files/usersEmployees.json');
 
   let json = JSON.stringify(users);
 
@@ -27,7 +27,7 @@ const writeFile = async users => {
 };
 
 const readFile = async () => {
-  const route = path.join(__dirname, 'Files/usersRoles.json');
+  const route = path.join(__dirname, 'Files/users.json');
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);
 };

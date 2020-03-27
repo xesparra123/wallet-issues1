@@ -9,14 +9,17 @@ const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
 
-//const searchCandidatePrehireWorker = require('./searchCandidatePrehire');
+const searchUserRolesWorker = require('./searchUserRoles');
 
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
 };
 
 const writeFile = async users => {
-  let route = path.join(__dirname, 'Files/usersRolesWallet.json');
+  let route = path.join(
+    __dirname,
+    'Files/usersEmployeesHRCandidatesPrehire.json'
+  );
 
   let json = JSON.stringify(users);
 
@@ -27,7 +30,7 @@ const writeFile = async users => {
 };
 
 const readFile = async () => {
-  const route = path.join(__dirname, 'Files/usersRoles.json');
+  const route = path.join(__dirname, 'Files/usersEmployeesHRCandidates.json');
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);
 };
@@ -64,7 +67,7 @@ const processJob = async () => {
 
       job.progress(100);
       await writeFile(users);
-      //searchCandidatePrehireWorker.addToQueue();
+      searchUserRolesWorker.addToQueue();
       // console.log('finalizando users roles');
       done(null, { date: new Date() });
       //done(null, job.data);

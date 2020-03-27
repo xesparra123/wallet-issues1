@@ -15,7 +15,10 @@ const addToQueue = set => {
 };
 
 const writeFile = async users => {
-  let route = path.join(__dirname, 'Files/usersRoles.json');
+  let route = path.join(
+    __dirname,
+    'Files/usersEmployeesHRCandidatesPrehireRoles.json'
+  );
 
   let json = JSON.stringify(users);
 
@@ -26,7 +29,10 @@ const writeFile = async users => {
 };
 
 const readFile = async () => {
-  const route = path.join(__dirname, 'Files/users.json');
+  const route = path.join(
+    __dirname,
+    'Files/usersEmployeesHRCandidatesPrehire.json'
+  );
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);
 };
