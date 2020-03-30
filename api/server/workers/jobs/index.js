@@ -8,6 +8,7 @@ const searchEmployeeHr = require('./searchEmployeeHR');
 const filterTypes = require('./filterTypes');
 const searchCandidatesPrehire = require('./searchCandidatePrehire');
 const searchCandidatesWallet = require('./searchCandidatesByUserId');
+const userOneRoleWithEmployeeWithHR = require('./userOneRoleWithEmployeeWithHR');
 
 module.exports = {
   accessCodes,
@@ -20,6 +21,7 @@ module.exports = {
   filterTypes,
   searchCandidatesPrehire,
   searchCandidatesWallet,
+  userOneRoleWithEmployeeWithHR,
   processAll: function() {
     this.accessCodes.processJob();
     this.validateAccount.processJob();
@@ -31,5 +33,6 @@ module.exports = {
     this.filterTypes.processJob();
     this.searchCandidatesPrehire.processJob();
     this.searchCandidatesWallet.processJob();
+    this.userOneRoleWithEmployeeWithHR.processJob();
   }
 };
