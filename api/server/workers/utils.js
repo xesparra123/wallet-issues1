@@ -59,6 +59,7 @@ const queueNames = {
   filterTypes: 'FILTER_TYPES',
   searchCandidatesPrehire: 'SEARCH_CANDIDATE_PREHIRE',
   searchCandidateEntity: 'SEARCH_CANDIDATE_ENTITY',
+  filterFixer: 'FILTERS_FIXER',
   userOneRoleWithEmployeeHR: 'USER_ONE_ROLE_WITH_EMPLOYEE_HR'
 };
 
@@ -100,6 +101,7 @@ const queuesProcesses = [
   'FILTER_TYPES',
   'SEARCH_CANDIDATE_PREHIRE',
   'SEARCH_CANDIDATE_ENTITY',
+  'FILTERS_FIXER',
   'USER_ONE_ROLE_WITH_EMPLOYEE_HR'
 ];
 
