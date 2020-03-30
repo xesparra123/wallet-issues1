@@ -23,4 +23,15 @@ const getEmployeesByUserId = async userId => {
     .where('employees.userId', userId);
 };
 
-module.exports = { getEmployeeByEntityId, getEmployeesByUserId };
+const updateEmployeeStatus = async (employeeId, active) => {
+  return await knex
+    .update({ active })
+    .from('employees')
+    .where({ id: employeeId });
+};
+
+module.exports = {
+  getEmployeeByEntityId,
+  getEmployeesByUserId,
+  updateEmployeeStatus
+};

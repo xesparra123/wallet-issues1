@@ -1,30 +1,40 @@
-const {
-  oneRoleButEmployeesFilter,
-  rolesButHRFilter,
-  rolesBothFilter
-} = require('./processor');
+const moment = require('moment');
+
+const userRolesRepository = require('../repositories/userRoles');
+const employeeRepository = require('../repositories/employees');
 
 // buscar los employees que estan repetidos un monton de veces en wallet
 // buscar los employees que estan repetidos un monton de veces en HR ( activos )
 
 const userWithOneRolRefencesOnTablesAndExitsReferenceOnHR = async data => {
-  //they are ok
+  //user con 1 solo user rol y  tienen employee  en wallet y el employee existe en HR (esta bien)
 
-  const userOneRoleWithEmployeeWithHR = data.filter(
-    user =>
-      user.user_roles.length === 1 &&
-      user.user_roles[0].employees.length === 1 &&
-      user.user_roles[0].employeeHr.length == 1
-  ); //user con 1 solo user rol y  tienen employee  en wallet y el employee existe en HR (esta bien)
+  for (const user of data) {
+    try {
+      const employee = user.employees[0];
+      const employeeHr = employee.employeeHr[0];
+      const roleId = user.userRoles[0].id;
+      const employeeId = employee.id;
 
-  return data;
+      if (employeeHr.status === 0 && employee.active !== 0) {
+        await employeeRepository.updateEmployeeStatus(employeeId, 0);
+        await userRolesRepository.updateRoleStatus(roleId, 0);
+      }
+
+      if (employeeHr.status === 1 && employee.active !== 1) {
+        console.log('activar rol y employee');
+        await employeeRepository.updateEmployeeStatus(employeeId, 1);
+        await userRolesRepository.updateRoleStatus(roleId, 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 };
 
 const userWithRolesRefencesOnTablesAndExitsReferenceOnHR = async data => {
   //select one of them
   //search all of the user roles and references duplicated and delete all of them
-
-  const userManyRolesWithEmployeeWithHR = rolesBothFilter(data); //user con mas de un user rol y  tienen employees  en wallet , y tienen employees en HR
 
   return data;
 };
@@ -32,17 +42,13 @@ const userWithRolesRefencesOnTablesAndExitsReferenceOnHR = async data => {
 const userWithRolesRefencesOnTablesAndExitsReferenceOnHRInactive = async data => {
   //select one of them
   //search all of the user roles and references duplicated and delete all of them
+  
   return data;
 };
 
 const userWithOneRolButNotExitsReferenceOnTables = async data => {
   //delete user role
   //create rol of wanderer for this user if the user doesn't have one
-
-  const userWithOneRoleWithOutEmployee = data.filter(
-    user =>
-      user.user_roles.length === 1 && user.user_roles[0].employees.length === 0
-  ); //user con 1 solo user rol y no tienen employee  en wallet
 
   return data;
 };
@@ -51,22 +57,42 @@ const userWithRolesButNotExitsReferenceOnTables = async data => {
   //delete user roles
   //create rol of wanderer for this user if the user doesn't have one
 
-  const userManyRolesButEmployees = oneRoleButEmployeesFilter(data); //user con mas de un user rol y no tienen employees  en wallet
+  for (const user of data) {
+    try {
+      user.userRoles.map(async role => {
+        const roleId = role.id;
+        const entity = role.cd_entity;
 
-  return data;
+        if (role !== 'wanderer')
+          await userRolesRepository.deleteUserRole(roleId, entity);
+        else {
+          const wanderer = await userRolesRepository.findUserRole(
+            roleId,
+            'wanderer'
+          );
+
+          if (!wanderer) {
+            const mappedRole = mapUserRole({
+              status: 0,
+              userId: user.id,
+              cd_entity: 'wanderer'
+            });
+
+            await userRolesRepository.createUserRole(mappedRole);
+            //update auth
+          }
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 };
 
 const userWithOneRolRefencesOnTablesButNotExitsReferenceOnHR = async data => {
   //delete user role
   //delete table reference
   //create rol of wanderer for this user if the user doesn't have one
-
-  const userOneRoleWithEmployeeButHR = data.filter(
-    user =>
-      user.user_roles.length === 1 &&
-      user.user_roles[0].employees.length === 1 &&
-      user.user_roles[0].employeeHr.length == 0
-  ); //user con 1 solo user rol y  tienen employee  en wallet , pero el employee no existe en HR
 
   return data;
 };
@@ -76,25 +102,23 @@ const userWithRolesRefencesOnTablesButNotExitsReferenceOnHR = async data => {
   //delete table reference
   //create rol of wanderer for this user if the user doesn't have one
 
-  const userManyRolesButEmployeesHR = rolesButHRFilter(data); //user con mas de un user rol y no tienen employees  en wallet
-
   return data;
 };
 
 const usersWithoutUserRoles = async data => {
   //if they have employees or candidates attach, create a user rol for them... validate if is correct asociated or not
 
-  const userWithoutRoles = data.filter(user => user.user_roles.length === 0); //user sin user rol
-
-  const userWithEmployeeOrCandidate = userWithoutRoles.filter(
-    user => user.employees.length || user.candidates.length
-  );
-
-  for (const user of userWithEmployeeOrCandidate) {
-    //create a user role for each user
-  }
-
   return data;
+};
+
+const mapUserRole = userRole => {
+  return {
+    cd_entity: userRole.cd_entity,
+    status: userRole.status,
+    userId: userRole.userId,
+    createdAt: moment().format('YYYY-MM-DD hh:mm:ss'),
+    updatedAt: moment().format('YYYY-MM-DD hh:mm:ss')
+  };
 };
 
 module.exports = {
