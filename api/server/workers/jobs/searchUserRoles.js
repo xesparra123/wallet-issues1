@@ -46,6 +46,7 @@ const processJob = async () => {
 
         users[i].user_roles = [];
         users[i].orphanRoles = [];
+        users[i].wandererRole = null;
 
         if (roles.length) {
           users[i].userRoles = roles;
