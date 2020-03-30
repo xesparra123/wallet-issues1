@@ -1,23 +1,25 @@
 let fs = require('fs');
 let path = require('path');
 
-const evercheckRepository = require('../../repositories/evercheck');
+const applicantRepository = require('../../repositories/applicants');
 const { createProducer, getQueue } = require('../utils');
-const helper = require('../../repositories/evercheck/helper');
 
-const queueName = 'SEARCH_EMPLOYEE_HR';
+const queueName = 'SEARCH_CANDIDATE_PREHIRE';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
 
-const searchCandidatesByUserIdWorker = require('./searchCandidatesByUserId');
+const searchUserRolesWorker = require('./searchUserRoles');
 
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
 };
 
 const writeFile = async users => {
-  let route = path.join(__dirname, 'Files/usersEmployeesHR.json');
+  let route = path.join(
+    __dirname,
+    'Files/usersEmployeesHRCandidatesPrehire.json'
+  );
 
   let json = JSON.stringify(users);
 
@@ -28,7 +30,7 @@ const writeFile = async users => {
 };
 
 const readFile = async () => {
-  const route = path.join(__dirname, 'Files/usersEmployees.json');
+  const route = path.join(__dirname, 'Files/usersEmployeesHRCandidates.json');
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);
 };
@@ -39,31 +41,31 @@ const processJob = async () => {
       let users = await readFile();
 
       for (let i = 0; i < users.length; i++) {
-        for (let j = 0; j < users[i].employees.length; j++) {
-          let number = users[i].employees[j].number;
-          let employerId = users[i].employees[j].employerId;
+        for (let j = 0; j < users[i].candidates.length; j++) {
+          let prehireApplicantId = users[i].candidates[j].prehireApplicantId;
 
-          let raw = await evercheckRepository.getEmployeeHr(number, employerId);
+          let candidates = await applicantRepository.getApplicantPrehire({
+            prehireApplicantId
+          });
 
-          users[i].employees[j].employeeHr = [];
+          users[i].candidates[j].candidatesPrehire = [];
 
-          if (raw.length) {
-            let employeeHr = helper.mapToEmployee(raw);
-
-            users[i].employees[j].employeeHr = employeeHr;
+          if (candidates.length > 0) {
+            users[i].candidates[j].candidatesPrehire = candidates;
           }
         }
+
         console.log(
-          `Searching employees HR.. i:${i} - total: ${
+          `Searching applicants prehire.. i:${i} - total: ${
             users.length
-          } - ${Math.round(((i + 1) / users.length) * 100)}%`
+          } -  ${Math.round(((i + 1) / users.length) * 100)}%`
         );
         job.progress(Math.round((i / users.length) * 100));
       }
 
       job.progress(100);
       await writeFile(users);
-      searchCandidatesByUserIdWorker.addToQueue();
+      searchUserRolesWorker.addToQueue();
       // console.log('finalizando users roles');
       done(null, { date: new Date() });
       //done(null, job.data);
