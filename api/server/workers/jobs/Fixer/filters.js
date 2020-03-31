@@ -10,7 +10,7 @@ const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
 
-const userOneRoleWithEmployeeWithHRJob = require('./userOneRoleWithEmployeeWithHRF');
+const userOneRoleWithEmployeeWithHRJob = require('./userOneRoleWithEmployeeWithHR');
 const userManyRolesButEmployeeJob = require('./userManyRolesButEmployee');
 const userManyRolesButEmployeesHRJob = require('./userManyRolesButEmployeesHR');
 
