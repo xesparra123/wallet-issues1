@@ -22,7 +22,6 @@ const userWithOneRolRefencesOnTablesAndExitsReferenceOnHR = async data => {
       }
 
       if (employeeHr.status === 1 && employee.active !== 1) {
-        console.log('activar rol y employee');
         await employeeRepository.updateEmployeeStatus(employeeId, 1);
         await userRolesRepository.updateRoleStatus(roleId, 1);
       }
@@ -42,7 +41,7 @@ const userWithRolesRefencesOnTablesAndExitsReferenceOnHR = async data => {
 const userWithRolesRefencesOnTablesAndExitsReferenceOnHRInactive = async data => {
   //select one of them
   //search all of the user roles and references duplicated and delete all of them
-  
+
   return data;
 };
 
@@ -63,15 +62,15 @@ const userWithRolesButNotExitsReferenceOnTables = async data => {
         const roleId = role.id;
         const entity = role.cd_entity;
 
-        if (role !== 'wanderer')
+        if (entity !== 'wanderer') {
           await userRolesRepository.deleteUserRole(roleId, entity);
-        else {
-          const wanderer = await userRolesRepository.findUserRole(
+        } else {
+          const wandererRole = await userRolesRepository.findUserRole(
             roleId,
             'wanderer'
           );
 
-          if (!wanderer) {
+          if (!wandererRole) {
             const mappedRole = mapUserRole({
               status: 0,
               userId: user.id,
@@ -93,6 +92,39 @@ const userWithOneRolRefencesOnTablesButNotExitsReferenceOnHR = async data => {
   //delete user role
   //delete table reference
   //create rol of wanderer for this user if the user doesn't have one
+
+  for (const user of data) {
+    try {
+      await employeeRepository.deleteEmployeeByUserId(user.id);
+
+      user.userRoles.map(async role => {
+        const roleId = role.id;
+        const entity = role.cd_entity;
+
+        if (entity !== 'wanderer') {
+          await userRolesRepository.deleteUserRole(roleId, entity);
+        } else {
+          const wandererRole = await userRolesRepository.findUserRole(
+            roleId,
+            'wanderer'
+          );
+
+          if (!wandererRole) {
+            const mappedRole = mapUserRole({
+              status: 0,
+              userId: user.id,
+              cd_entity: 'wanderer'
+            });
+
+            await userRolesRepository.createUserRole(mappedRole);
+            //update auth
+          }
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return data;
 };

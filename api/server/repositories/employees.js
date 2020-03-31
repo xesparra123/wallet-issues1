@@ -30,8 +30,16 @@ const updateEmployeeStatus = async (employeeId, active) => {
     .where({ id: employeeId });
 };
 
+const deleteEmployeeByUserId = async userId => {
+  return await knex
+    .from('employees')
+    .where({ userId })
+    .del();
+};
+
 module.exports = {
   getEmployeeByEntityId,
   getEmployeesByUserId,
-  updateEmployeeStatus
+  updateEmployeeStatus,
+  deleteEmployeeByUserId
 };

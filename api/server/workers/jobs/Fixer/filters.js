@@ -10,6 +10,10 @@ const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
 
+const userOneRoleWithEmployeeWithHRJob = require('./userOneRoleWithEmployeeWithHRF');
+const userManyRolesButEmployeeJob = require('./userManyRolesButEmployee');
+const userManyRolesButEmployeesHRJob = require('./userManyRolesButEmployeesHR');
+
 const addToQueue = set => {
   return createProducer(queue, queueName, { set }, 2, 10000);
 };
@@ -23,11 +27,8 @@ const readFile = async () => {
   return JSON.parse(rawdata);
 };
 
-const writeFile = async (users,fileName) => {
-  let route = path.join(
-    __dirname,
-    `Files/${fileName}.json`
-  );
+const writeFile = async (users, fileName) => {
+  let route = path.join(__dirname, `../Files/${fileName}.json`);
 
   let json = JSON.stringify(users);
 
@@ -47,10 +48,44 @@ const processJob = async () => {
       ); //user sin user rol
 
       await writeFile(userWithoutRoles, 'userWithoutRoles');
-      console.log('Filtering cases.. 10%');
+      console.log('Filtering cases... 10%');
 
       job.progress(10);
 
+      const userOneRoleWithEmployeeWithHR = users.filter(user => {
+        user.userRoles.length === 1 &&
+          user.employees.length === 1 &&
+          user.employees[0].employeeHr.length === 1;
+      });
+
+      await writeFile(
+        userOneRoleWithEmployeeWithHR,
+        'userOneRoleWithEmployeeWithHR'
+      );
+
+      userOneRoleWithEmployeeWithHRJob.addToQueue();
+      console.log('Filtering cases... 20%');
+
+      const userManyRolesButEmployee = users.filter(user => {
+        user.userRoles.length > 1 &&
+          (user.employees.length === 0 || user.candidates.length === 0);
+      });
+
+      await writeFile(userManyRolesButEmployee, 'userManyRolesButEmployee');
+
+      userManyRolesButEmployeeJob.addToQueue();
+      console.log('Filtering cases... 30%');
+
+      const userManyRolesButEmployeeHR = users.filter(user => {
+        user.userRoles.length > 1 &&
+          user.employees.length === 1 &&
+          user.employees[0].employeeHr.length === 0;
+      });
+
+      await writeFile(userManyRolesButEmployeeHR, 'userManyRolesButEmployeeHR');
+
+      userManyRolesButEmployeesHRJob.addToQueue();
+      console.log('Filtering cases... 40%');
 
       //AQUI DEBEN IR PONIENDO LOS DEMAS FILTROS
 
