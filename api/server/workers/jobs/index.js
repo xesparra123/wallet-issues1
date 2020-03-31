@@ -9,7 +9,9 @@ const filterTypes = require('./filterTypes');
 const searchCandidatesPrehire = require('./searchCandidatePrehire');
 const searchCandidatesWallet = require('./searchCandidatesByUserId');
 const filterFixer = require('./Fixer/filters');
-const userOneRoleWithEmployeeWithHR = require('./Fixer/userOneRoleWithEmployeeWithHR');
+const userOneRoleWithEmployeeWithHR = require('./Fixer/caseFour');
+const userManyRolesButEmployee = require('./Fixer/caseFive');
+const userManyRolesButEmployeeHR = require('./Fixer/caseSix');
 
 module.exports = {
   accessCodes,
@@ -24,6 +26,8 @@ module.exports = {
   searchCandidatesWallet,
   filterFixer,
   userOneRoleWithEmployeeWithHR,
+  userManyRolesButEmployee,
+  userManyRolesButEmployeeHR,
   processAll: function() {
     this.accessCodes.processJob();
     this.validateAccount.processJob();
@@ -37,5 +41,7 @@ module.exports = {
     this.searchCandidatesWallet.processJob();
     this.filterFixer.processJob();
     this.userOneRoleWithEmployeeWithHR.processJob();
+    this.userManyRolesButEmployee.processJob();
+    this.userManyRolesButEmployeeHR.processJob();
   }
 };

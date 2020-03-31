@@ -14,11 +14,11 @@ const deleteUserRole = async (roleId, entity) => {
     .del();
 };
 
-const findUserRole = async (roleId, entity) => {
+const findUserRole = async (entity, userId) => {
   const result = await knex
     .select()
     .from('user_roles')
-    .where({ id: roleId, cd_entity: entity });
+    .where({ cd_entity: entity, userId });
 
   return result[0];
 };
