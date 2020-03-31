@@ -28,14 +28,29 @@ const readFile = async () => {
   return JSON.parse(rawdata);
 };
 
+const writeFile = async (data, fileName) => {
+  let route = path.join(__dirname, `Reports/${fileName}.json`);
+
+  let json = JSON.stringify(data);
+
+  let fileExits = await fs.existsSync(route);
+  if (fileExits) await fs.unlinkSync(route);
+
+  await fs.writeFileSync(route, json, 'utf8');
+};
+
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
     try {
       let data = await readFile();
+      let rolesUpdated = 0,
+        employeesUpdated = 0,
+        rolesDeleted = 0;
 
       for (let i = 0; i < data.rolesToDelete.length; i++) {
         console.log('Eliminando user role..', data.rolesToDelete[i].id);
         await deleteUserRole(data.rolesToDelete[i].id, 'employee');
+        rolesDeleted++;
       }
 
       job.progress(33);
@@ -47,10 +62,11 @@ const processJob = async () => {
           id: data.rolesToUpdate[j].id,
           status: data.rolesToUpdate[j].status
         });
-        // await updateRoleStatus(
-        //   data.rolesToUpdate[j].id,
-        //   data.rolesToUpdate[j].status
-        // );
+        await updateRoleStatus(
+          data.rolesToUpdate[j].id,
+          data.rolesToUpdate[j].status
+        );
+        rolesUpdated++;
       }
 
       job.progress(66);
@@ -62,13 +78,20 @@ const processJob = async () => {
           id: data.employeesToUpdate[k].id,
           status: data.employeesToUpdate[k].status
         });
-        // await updateEmployeeStatus(
-        //   data.employeesToUpdate[k].id,
-        //   data.employeesToUpdate[k].status
-        // );
+        await updateEmployeeStatus(
+          data.employeesToUpdate[k].id,
+          data.employeesToUpdate[k].status
+        );
+        employeesUpdated++;
       }
 
       console.log('Case 7: 100%');
+
+      console.log('Generando reporte...');
+      await writeFile(
+        { rolesDeleted, rolesUpdated, employeesUpdated },
+        'caseSeven'
+      );
       job.progress(100);
 
       done(null, { date: new Date() });

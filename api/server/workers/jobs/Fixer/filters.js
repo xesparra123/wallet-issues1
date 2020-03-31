@@ -99,7 +99,7 @@ const processJob = async () => {
       console.log('Filtering cases... 40%');
 
       //case 7
-	  const caseSeven = filterCaseSeven(users);
+      const caseSeven = filterCaseSeven(users);
       await writeFile(caseSeven, 'caseSeven');
       usersManyRolesWorker.addToQueue();
 

@@ -17,7 +17,7 @@ const {
 const readFile = async () => {
   const route = path.join(
     __dirname,
-    '../Files/userOneRoleWithEmployeeWithHR.json'
+    'Files/userOneRoleWithEmployeeWithHR.json'
   );
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);

@@ -15,7 +15,7 @@ const {
 } = require('../../../processor/processor-v2');
 
 const readFile = async () => {
-  const route = path.join(__dirname, '../Files/userManyRolesButEmployeeHR.json');
+  const route = path.join(__dirname, 'Files/userManyRolesButEmployeeHR.json');
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);
 };
