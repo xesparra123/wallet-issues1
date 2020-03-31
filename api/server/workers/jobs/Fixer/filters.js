@@ -2,9 +2,11 @@
 
 let fs = require('fs');
 let path = require('path');
-
+const { filterCaseSeven, filterCaseEight } = require('./helper');
 const { createProducer, getQueue } = require('../../utils');
 
+const usersManyRolesWorker = require('./usersManyRoles');
+const usersManyEntitiesWorker = require('./usersManyEntities');
 const queueName = 'FILTERS_FIXER';
 const concurrency = process.env[queueName] || 50;
 
@@ -28,7 +30,7 @@ const readFile = async () => {
 };
 
 const writeFile = async (users, fileName) => {
-  let route = path.join(__dirname, `../Files/${fileName}.json`);
+  let route = path.join(__dirname, `Files/${fileName}.json`);
 
   let json = JSON.stringify(users);
 
@@ -96,6 +98,15 @@ const processJob = async () => {
       userManyRolesButEmployeeHRJob.addToQueue();
       console.log('Filtering cases... 40%');
 
+      //case 7
+	  const caseSeven = filterCaseSeven(users);
+      await writeFile(caseSeven, 'caseSeven');
+      usersManyRolesWorker.addToQueue();
+
+      //case 8
+      const caseEight = filterCaseEight(users);
+      await writeFile(caseEight, 'caseEight');
+      usersManyEntitiesWorker.addToQueue();
       //AQUI DEBEN IR PONIENDO LOS DEMAS FILTROS
 
       job.progress(100);

@@ -12,6 +12,9 @@ const filterFixer = require('./Fixer/filters');
 const userOneRoleWithEmployeeWithHR = require('./Fixer/caseFour');
 const userManyRolesButEmployee = require('./Fixer/caseFive');
 const userManyRolesButEmployeeHR = require('./Fixer/caseSix');
+const userManyEntities = require('./Fixer/usersManyEntities');
+const userManyRoles = require('./Fixer/usersManyRoles');
+
 
 module.exports = {
   accessCodes,
@@ -28,6 +31,8 @@ module.exports = {
   userOneRoleWithEmployeeWithHR,
   userManyRolesButEmployee,
   userManyRolesButEmployeeHR,
+  userManyEntities,
+  userManyRoles,
   processAll: function() {
     this.accessCodes.processJob();
     this.validateAccount.processJob();
@@ -43,5 +48,7 @@ module.exports = {
     this.userOneRoleWithEmployeeWithHR.processJob();
     this.userManyRolesButEmployee.processJob();
     this.userManyRolesButEmployeeHR.processJob();
+    this.userManyEntities.processJob();
+    this.userManyRoles.processJob();
   }
 };

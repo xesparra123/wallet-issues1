@@ -28,70 +28,21 @@ const getEmployeesDuplicated = async (req, res, next) => {
   try {
     await workers.searchUsers.addToQueue();
 
-    // const userWithRoles = await userRepository.getUsers(employerId);
-
-    // const usersWithOneEmployeeRole = userWithRoles.filter(user => {
-    //   console.log('user', user);
-    //   return user.user_roles.length === 1;
-    // });
-
-    // console.log('users with one employee role', usersWithOneEmployeeRole);
-
-    // const userWithoutRoles = userWithRoles.filter(
-    //   user => user.user_roles.length === 0
-    // );
-
-    // console.log('users without roles', userWithoutRoles);
-
-    // const employeesMoreThanOneRoles = userWithRoles.filter(
-    //   user => user.user_roles.length > 1
-    // );
-
-    // console.log('users with more than one roles', employeesMoreThanOneRoles);
-
-    // const usersWithOneEmployeeRoleFile = path.join(
-    //   __dirname,
-    //   'Files/usersWithOneEmployeeRole.json'
-    // );
-
-    // const userWithoutRolesFile = path.join(
-    //   __dirname,
-    //   'Files/userWithoutRoles.json'
-    // );
-
-    // const employeesMoreThanOneRolesFile = path.join(
-    //   __dirname,
-    //   'Files/employeesMoreThanOneRoles.json'
-    // );
-
-    // await helper.generateJson(
-    //   usersWithOneEmployeeRoleFile,
-    //   usersWithOneEmployeeRole
-    // );
-
-    // await helper.generateJson(
-    //   employeesMoreThanOneRolesFile,
-    //   employeesMoreThanOneRoles
-    // );
-
-    // await helper.generateJson(userWithoutRolesFile, userWithoutRoles);
-
-    //TODO: CALL SEARCH USERS WORKER
-    // //send to worker to valida on wallet data
-    //await workers.searchEmployeesDuplicates(route);
-    //await workers.searchEmployeesDuplicated.addToQueue(route);
-
-    // res.status(200).json({
-    //   msg: 'Archivos encolado para procesar',
-    //   files: [
-    //     usersWithOneEmployeeRoleFile,
-    //     userWithoutRolesFile,
-    //     employeesMoreThanOneRolesFile
-    //   ]
-    // });
-
     res.status(200).json({
       msg: 'User roles process queued'
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+const runFixer = async (req, res, next) => {
+  try {
+    await workers.filterFixer.addToQueue();
+
+    res.status(200).json({
+      msg: 'User fixer process queued'
     });
   } catch (error) {
     console.log(error);
@@ -218,5 +169,6 @@ const testGenerateFile = async (req, res, next) => {
 module.exports = {
   getAccessCodeRevoked,
   getEmployeesDuplicated,
-  testGenerateFile
+  testGenerateFile,
+  runFixer
 };
