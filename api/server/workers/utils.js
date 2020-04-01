@@ -58,7 +58,13 @@ const queueNames = {
   searchEmployeeHr: 'SEARCH_EMPLOYEE_HR',
   filterTypes: 'FILTER_TYPES',
   searchCandidatesPrehire: 'SEARCH_CANDIDATE_PREHIRE',
-  searchCandidateEntity: 'SEARCH_CANDIDATE_ENTITY'
+  searchCandidateEntity: 'SEARCH_CANDIDATE_ENTITY',
+  filterFixer: 'FILTERS_FIXER',
+  userOneRoleWithEmployeeHR: 'USER_ONE_ROLE_WITH_EMPLOYEE_HR',
+  userManyRolesButEmployee: 'USER_ROLES_WITHOUT_EMPLOYEE',
+  userManyRolesButEmployeeHR:'USER_ROLES_WITH_EMPLOYEE_BUT_HR',
+  usersManyEntities: 'USERS_MANY_ENTITIES_FIXER',
+  usersManyRoles: 'USERS_MANY_ROLES_FIXER'
 };
 
 // const updateFlagInRedis = async ({ fileId, rowId }) => {
@@ -98,7 +104,13 @@ const queuesProcesses = [
   'SEARCH_EMPLOYEE_HR',
   'FILTER_TYPES',
   'SEARCH_CANDIDATE_PREHIRE',
-  'SEARCH_CANDIDATE_ENTITY'
+  'SEARCH_CANDIDATE_ENTITY',
+  'FILTERS_FIXER',
+  'USER_ONE_ROLE_WITH_EMPLOYEE_HR',
+  'USER_ROLES_WITHOUT_EMPLOYEE',
+  'USER_ROLES_WITH_EMPLOYEE_BUT_HR',
+  'USERS_MANY_ENTITIES_FIXER',
+  'USERS_MANY_ROLES_FIXER'
 ];
 
 module.exports = {

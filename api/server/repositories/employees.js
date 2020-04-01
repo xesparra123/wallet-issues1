@@ -1,4 +1,5 @@
 const knex = require('../db');
+const employeePositionRepository = require('./employeePosition');
 
 const getEmployeeByEntityId = async entityId => {
   //Validations
@@ -23,14 +24,43 @@ const getEmployeesByUserId = async userId => {
     .where('employees.userId', userId);
 };
 
-const updateEmployee = async (data, id) => {
-  return knex('employees')
-    .update(data)
-    .where({ id });
+const updateEmployeeStatus = async (employeeId, active) => {
+  return await knex
+    .update({ active })
+    .from('employees')
+    .where({ id: employeeId });
+};
+
+const deleteEmployeeById = async id => {
+  const positions = await employeePositionRepository.findPositionsByEmployeeId(
+    id
+  );
+
+  for (const position of positions) {
+    await employeePositionRepository.deleteRequirementSetById(
+      position.employeeRequirementSetId
+    );
+  }
+
+  for (const position of positions) {
+    await employeePositionRepository.deletePositionSetById(
+      position.employeePositionSetId
+    );
+
+    await employeePositionRepository.deletePositionById(
+      position.employeePositionId
+    );
+  }
+
+  await knex
+    .from('employees')
+    .where({ id })
+    .del();
 };
 
 module.exports = {
   getEmployeeByEntityId,
   getEmployeesByUserId,
-  updateEmployee
+  updateEmployeeStatus,
+  deleteEmployeeById
 };

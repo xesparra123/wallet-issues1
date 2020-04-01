@@ -44,7 +44,7 @@ const processJob = async () => {
       for (let i = 0; i < users.length; i++) {
         let roles = await userRepository.userRolesByUserId(users[i].id);
 
-        users[i].user_roles = [];
+        users[i].userRoles = [];
         users[i].orphanRoles = [];
         users[i].wandererRole = null;
 

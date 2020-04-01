@@ -33,14 +33,15 @@ const processJob = async () => {
       const stream = await userRepository.getUsers().stream();
 
       stream
-        .on('readable', async () => {
+        .on('readable', () => {
           try {
-            let user = await stream.read();
+            let user = stream.read();
 
             while (user) {
+              console.log('user', user);
               users.push(user);
 
-              user = await stream.read();
+              user = stream.read();
             }
           } catch (error) {
             done(error);
@@ -48,6 +49,7 @@ const processJob = async () => {
         })
         .on('end', async () => {
           job.progress(100);
+          console.log('users', users);
           await writeFile(users);
           searchEmployeesByUserIdWorker.addToQueue();
           done(null, { date: new Date(), count: users.length });

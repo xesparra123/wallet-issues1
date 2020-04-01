@@ -131,7 +131,9 @@ const getUsers = () => {
       'user.accountId'
       //'user_roles.*'
     )
-    .from('users AS user');
+    .from('users AS user')
+    .where('user.id', 1093022)
+    .limit(1);
 };
 
 const getEmployees = async data => {
