@@ -5,7 +5,7 @@ const authService = require('../../../services/auth');
 
 const userRoleRepository = require('../../../repositories/userRoles');
 const employeeRepository = require('../../../repositories/employees');
-const candidateRepository = require('../../../repositories/candidates');
+const applicantRepository = require('../../../repositories/applicants');
 
 const ENTITY_TYPES = require('../../../constants');
 
@@ -35,13 +35,17 @@ const writeFile = async users => {
 };
 
 const readFile = async () => {
-  const route = path.join(
-    __dirname,
-    'Files/usersEmployeesHRCandidatesPrehire.json'
-  );
+  const route = path.join(__dirname, 'Files/caseThree.json');
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);
 };
+
+/*
+3. user con 1 solo user rol y tienen employee/candidate en wallet , pero el employee no existe en HR (userOneRoleWithEmployeeButHR)
+    *delete user role
+    *delete table reference
+    *create rol of wanderer for this user if the user doesn't have one, actualizar el rol en el auth
+*/
 
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
@@ -52,15 +56,15 @@ const processJob = async () => {
         let roles = user.userRoles;
 
         for (let role of roles) {
-          await userRoleRepository.delete(role.id);
+          await userRoleRepository.deleteUserRole(role.id, role.cd_entity);
         }
 
         for (let employee of user.employees) {
-          await employeeRepository.remove(employee.id);
+          await employeeRepository.deleteEmployeeById(employee.id);
         }
 
         for (let candidate of user.candidates) {
-          await candidateRepository.remove(candidate.id);
+          await applicantRepository.deleteApplicantById(candidate.id);
         }
 
         await authService.updateAccountRoles(user.accountId, {

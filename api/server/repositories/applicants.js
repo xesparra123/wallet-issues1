@@ -2,6 +2,8 @@ const knex = require('../db');
 const prehire = require('../db/prehire');
 const TABLES = require('../db/prehire/tables');
 
+const applicantPositionRepository = require('./applicantPosition');
+
 const getApplicantbyEntityId = async entityId => {
   //Validations
   if (!entityId) throw new Error('entityId is required');
@@ -65,9 +67,37 @@ const getApplicantPrehireByTaleoAndEmployerId = async ({
   return result[0];
 };
 
+const deleteApplicantById = async id => {
+  const positions = await applicantPositionRepository.findPositionsByApplicantId(
+    id
+  );
+
+  for (const position of positions) {
+    await applicantPositionRepository.deleteRequirementSetById(
+      position.ApplicantRequirementSetId
+    );
+  }
+
+  for (const position of positions) {
+    await applicantPositionRepository.deletePositionSetById(
+      position.ApplicantPositionSetId
+    );
+
+    await applicantPositionRepository.deletePositionById(
+      position.ApplicantPositionId
+    );
+  }
+
+  await knex
+    .from('applicants')
+    .where({ id })
+    .del();
+};
+
 module.exports = {
   getApplicantbyEntityId,
   getApplicantsByUserId,
   getApplicantPrehireById,
-  getApplicantPrehireByTaleoAndEmployerId
+  getApplicantPrehireByTaleoAndEmployerId,
+  deleteApplicantById
 };

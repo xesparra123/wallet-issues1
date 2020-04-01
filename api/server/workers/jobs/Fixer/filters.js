@@ -2,7 +2,13 @@
 
 let fs = require('fs');
 let path = require('path');
-const { filterCaseSeven, filterCaseEight } = require('./helper');
+const {
+  filterCaseOne,
+  filterCaseTwo,
+  filterCaseThree,
+  filterCaseSeven,
+  filterCaseEight
+} = require('./helper');
 const { createProducer, getQueue } = require('../../utils');
 
 const usersManyRolesWorker = require('./usersManyRoles');
@@ -11,6 +17,10 @@ const queueName = 'FILTERS_FIXER';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);
+
+const caseOneJob = require('./case1');
+const caseTwoJob = require('./case2');
+const caseThreeJob = require('./case3');
 
 const userOneRoleWithEmployeeWithHRJob = require('./caseFour');
 const userManyRolesButEmployeeJob = require('./caseFive');
@@ -45,14 +55,17 @@ const processJob = async () => {
     try {
       let users = await readFile();
 
-      const userWithoutRoles = users.filter(
-        user => user.user_roles.length === 0
-      ); //user sin user rol
+      const caseOne = filterCaseOne(users);
+      await writeFile(caseOne, 'caseOne');
+      caseOneJob.addToQueue();
 
-      await writeFile(userWithoutRoles, 'userWithoutRoles');
-      console.log('Filtering cases... 10%');
+      const caseTwo = filterCaseTwo(users);
+      await writeFile(caseTwo, 'caseTwo');
+      caseTwoJob.addToQueue();
 
-      job.progress(10);
+      const caseThree = filterCaseThree(users);
+      await writeFile(caseThree, 'caseThree');
+      caseThreeJob.addToQueue();
 
       const userOneRoleWithEmployeeWithHR = users.filter(user => {
         return (

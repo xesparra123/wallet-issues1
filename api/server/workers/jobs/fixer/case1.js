@@ -5,7 +5,7 @@ const authService = require('../../../services/auth');
 
 const userRoleRepository = require('../../../repositories/userRoles');
 const employeeRepository = require('../../../repositories/employees');
-const candidateRepository = require('../../../repositories/candidates');
+const applicantRepository = require('../../../repositories/applicants');
 
 const ENTITY_TYPES = require('../../../constants');
 
@@ -35,13 +35,19 @@ const writeFile = async users => {
 };
 
 const readFile = async () => {
-  const route = path.join(
-    __dirname,
-    'Files/usersEmployeesHRCandidatesPrehire.json'
-  );
+  const route = path.join(__dirname, 'Files/caseOne.json');
   const rawdata = fs.readFileSync(route);
   return JSON.parse(rawdata);
 };
+
+/*
+1. user sin user rol (userWithoutRoles)
+    * if they have employees or candidates attach, create a user rol for them... validate if is correct asociated or not
+        - Crear user role para employee y candidate (status en prehire o HR)
+        - Si no está activo en wallet pero sí en HR, entonces crear rol employee y activar employee en wallet. 
+        Crear rol de wanderer
+        - Si no tiene nada activo, actualizar el rol en el auth
+*/
 
 const processJob = async () => {
   queue.process(queueName, concurrency, async (job, done) => {
@@ -54,14 +60,15 @@ const processJob = async () => {
 
         for (let employee of employees) {
           if (!employee.employeeHR) {
-            await employeeRepository.delete();
+            await employeeRepository.deleteEmployeeById(employee.id);
             continue;
           }
 
-          await employeeRepository.update(
-            { active: employee.employeeHR.status },
-            employee.id
+          await employeeRepository.updateEmployeeStatus(
+            employee.id,
+            employee.employeeHR.status
           );
+
           await userRoleRepository.createUserRole({
             cd_entity: 'employee',
             id_entity: employee.id,
@@ -72,7 +79,7 @@ const processJob = async () => {
 
         for (let candidate of candidates) {
           if (!candidate.candidatePrehire) {
-            await candidateRepository.delete(candidate.id);
+            await applicantRepository.deleteApplicantById(candidate.id);
             continue;
           }
 
@@ -103,6 +110,7 @@ const processJob = async () => {
           userId: user.id,
           status: true
         });
+
         job.progress(Math.round((index / users.length) * 100));
       }
 
