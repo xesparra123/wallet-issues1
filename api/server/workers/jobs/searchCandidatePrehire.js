@@ -44,9 +44,20 @@ const processJob = async () => {
         for (let j = 0; j < users[i].candidates.length; j++) {
           let prehireApplicantId = users[i].candidates[j].prehireApplicantId;
 
-          let candidates = await applicantRepository.getApplicantPrehire({
-            prehireApplicantId
-          });
+          let candidates = null;
+
+          if (prehireApplicantId) {
+            candidates = await applicantRepository.getApplicantPrehireById({
+              prehireApplicantId
+            });
+          } else {
+            candidates = await applicantRepository.getApplicantPrehireByTaleoAndEmployerId(
+              {
+                taleoId: users[i].candidates[j].taleoId,
+                employerId: users[i].candidates[j].employerId
+              }
+            );
+          }
 
           users[i].candidates[j].candidatesPrehire = [];
 

@@ -1,5 +1,23 @@
 const _ = require('lodash');
 
+const filterCaseOne = users => {
+  return users.filter(user => user.userRoles.length === 0);
+};
+
+const filterCaseTwo = users => {
+  let filteredUsers = users.filter(user => user.userRoles.length === 1);
+
+  return filteredUsers.filter(
+    user => user.candidate.length + user.employee.length === 0
+  );
+};
+
+const filterCaseThree = users => {
+  let filteredUsers = users.filter(user => user.userRoles.length === 1);
+
+  return filteredUsers.filter();
+};
+
 const filterCaseSeven = users => {
   let result = {
     rolesToUpdate: [],
@@ -51,7 +69,9 @@ const filterCaseEight = users => {
     rolesToDelete: []
   };
   for (let i = 0; i < users.length; i++) {
-    console.log(`user: ${users[i].id} - employees: ${users[i].employees.length}`);
+    console.log(
+      `user: ${users[i].id} - employees: ${users[i].employees.length}`
+    );
 
     let data = users[i].employees;
     let employeesByNumber = _.chain(data)
@@ -100,4 +120,10 @@ const filterCaseEight = users => {
   return result;
 };
 
-module.exports = { filterCaseSeven, filterCaseEight };
+module.exports = {
+  filterCaseOne,
+  filterCaseTwo,
+  filterCaseThree,
+  filterCaseSeven,
+  filterCaseEight
+};
