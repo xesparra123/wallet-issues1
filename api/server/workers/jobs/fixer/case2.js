@@ -7,7 +7,7 @@ const userRoleRepository = require('../../../repositories/userRoles');
 
 const ENTITY_TYPES = require('../../../constants');
 
-const { createProducer, getQueue } = require('../utils');
+const { createProducer, getQueue } = require('../../utils');
 
 const queueName = 'SEARCH_USER_ROLES';
 const concurrency = process.env[queueName] || 50;
