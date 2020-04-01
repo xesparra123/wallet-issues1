@@ -8,14 +8,24 @@ const filterCaseTwo = users => {
   let filteredUsers = users.filter(user => user.userRoles.length === 1);
 
   return filteredUsers.filter(
-    user => user.candidate.length + user.employee.length === 0
+    user => user.candidates.length + user.employees.length === 0
   );
 };
 
 const filterCaseThree = users => {
   let filteredUsers = users.filter(user => user.userRoles.length === 1);
 
-  return filteredUsers.filter();
+  return filteredUsers.filter(user => {
+    let withoutCandidatePrehire = user.candidates.every(
+      candidate => candidate.candidatesPrehire.length === 0
+    );
+
+    let withoutEmployeeHr = user.employees.every(
+      employee => employee.employeeHr.length === 0
+    );
+
+    return withoutEmployeeHr && withoutCandidatePrehire;
+  });
 };
 
 const filterCaseSeven = users => {

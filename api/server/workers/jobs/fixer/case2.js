@@ -9,7 +9,7 @@ const ENTITY_TYPES = require('../../../constants');
 
 const { createProducer, getQueue } = require('../../utils');
 
-const queueName = 'SEARCH_USER_ROLES';
+const queueName = 'CASE_2';
 const concurrency = process.env[queueName] || 50;
 
 const queue = getQueue(queueName);

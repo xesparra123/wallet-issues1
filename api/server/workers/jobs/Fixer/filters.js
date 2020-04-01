@@ -67,7 +67,7 @@ const processJob = async () => {
       await writeFile(caseThree, 'caseThree');
       caseThreeJob.addToQueue();
 
-      const userOneRoleWithEmployeeWithHR = users.filter(user => {
+      /*       const userOneRoleWithEmployeeWithHR = users.filter(user => {
         return (
           user.userRoles &&
           user.userRoles.length === 1 &&
@@ -122,7 +122,7 @@ const processJob = async () => {
       usersManyEntitiesWorker.addToQueue();
       //AQUI DEBEN IR PONIENDO LOS DEMAS FILTROS
 
-      job.progress(100);
+      job.progress(100); */
 
       console.log('FINALIZANDO FILTER...');
       done(null, { date: new Date() });
