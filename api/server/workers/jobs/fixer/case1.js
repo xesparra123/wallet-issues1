@@ -59,33 +59,33 @@ const processJob = async () => {
         const candidates = user.candidates;
 
         for (let employee of employees) {
-          if (!employee.employeeHR) {
+          if (employee.employeeHr.length === 0) {
             await employeeRepository.deleteEmployeeById(employee.id);
             continue;
           }
 
           await employeeRepository.updateEmployeeStatus(
             employee.id,
-            employee.employeeHR.status
+            employee.employeeHr.status
           );
 
           await userRoleRepository.createUserRole({
             cd_entity: 'employee',
             id_entity: employee.id,
             userId: user.id,
-            status: employee.employeeHR.status
+            status: employee.employeeHr.status
           });
         }
 
         for (let candidate of candidates) {
-          if (!candidate.candidatePrehire) {
+          if (candidate.candidatesPrehire.length === 0) {
             await applicantRepository.deleteApplicantById(candidate.id);
             continue;
           }
 
           let employee = employees.find(
             employee =>
-              employee.employerId === candidate.candidatePrehire.employerId
+              employee.employerId === candidate.candidatesPrehire[0].employerId
           );
 
           if (!employee) {
@@ -93,7 +93,7 @@ const processJob = async () => {
               cd_entity: 'applicant',
               id_entity: candidate.id,
               userId: user.id,
-              status: candidate.candidateHR.status
+              status: true
             });
           }
         }
